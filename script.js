@@ -17,9 +17,11 @@ const exitBtn = document.getElementById("exitBtn");
 /* ============================= */
 
 let score = 0;
-let speed = 3;
+
+/* 🔥 MÁS RÁPIDO DESDE EL INICIO */
+let speed = 5;                 // Antes 3
 let level = 1;
-let obstacleSpawnRate = 1000;
+let obstacleSpawnRate = 700;   // Antes 1000
 let gameActive = false;
 
 let obstacleInterval;
@@ -56,15 +58,13 @@ function startGame() {
   resetGame();
   gameActive = true;
 
-  // Intervalo que crea obstáculos constantemente
   obstacleInterval = setInterval(createObstacle, obstacleSpawnRate);
 
-  // Intervalo que aumenta puntaje
   scoreInterval = setInterval(() => {
     score++;
     scoreDisplay.textContent = score;
     checkLevelUp();
-  }, 200);
+  }, 150); // 🔥 Puntaje sube más rápido
 }
 
 /* ============================= */
@@ -72,15 +72,19 @@ function startGame() {
 /* ============================= */
 
 function checkLevelUp() {
-  let newLevel = Math.floor(score / 100) + 1;
+
+  /* 🔥 Ahora sube nivel cada 80 puntos */
+  let newLevel = Math.floor(score / 80) + 1;
 
   if (newLevel !== level) {
     level = newLevel;
     levelDisplay.textContent = level;
 
-    // Aumenta dificultad
-    speed += 1;
-    obstacleSpawnRate = Math.max(300, obstacleSpawnRate - 100);
+    /* ⚡ Aumenta velocidad MÁS fuerte */
+    speed += 2;
+
+    /* 🚧 Más obstáculos más rápido */
+    obstacleSpawnRate = Math.max(200, obstacleSpawnRate - 120);
 
     clearInterval(obstacleInterval);
     obstacleInterval = setInterval(createObstacle, obstacleSpawnRate);
@@ -95,16 +99,12 @@ function checkLevelUp() {
 
 function changeVisuals() {
   const index = level % levelBackgrounds.length;
-
-  // Cambia fondo
   game.style.background = levelBackgrounds[index];
-
-  // Cambia sombra
   game.style.boxShadow = levelShadows[index];
 }
 
 /* ===================================================== */
-/* 🎮 CONTROL TECLADO (SOLO FUNCIONA EN PC) */
+/* 🎮 CONTROL TECLADO (PC) */
 /* ===================================================== */
 
 document.addEventListener("keydown", (e) => {
@@ -114,44 +114,37 @@ document.addEventListener("keydown", (e) => {
   const playerWidth = player.offsetWidth;
   let currentLeft = player.offsetLeft;
 
-  // Flecha izquierda
   if (e.key === "ArrowLeft") {
-    currentLeft -= gameWidth * 0.05;
+    currentLeft -= gameWidth * 0.07; // 🔥 Se mueve más rápido
   }
 
-  // Flecha derecha
   if (e.key === "ArrowRight") {
-    currentLeft += gameWidth * 0.05;
+    currentLeft += gameWidth * 0.07;
   }
 
-  // Evita que salga del área
   currentLeft = Math.max(0, Math.min(gameWidth - playerWidth, currentLeft));
-
   player.style.left = currentLeft + "px";
 });
 
 /* ===================================================== */
-/* 📱 CONTROL MÓVIL (FUNCIONA CON EL DEDO) */
+/* 📱 CONTROL MÓVIL */
 /* ===================================================== */
 
 let isTouching = false;
 
-// Cuando el usuario toca la pantalla
 game.addEventListener("touchstart", () => {
   if (!gameActive) return;
   isTouching = true;
 });
 
-// Cuando deja de tocar
 game.addEventListener("touchend", () => {
   isTouching = false;
 });
 
-// Cuando mueve el dedo
 game.addEventListener("touchmove", (e) => {
   if (!gameActive || !isTouching) return;
 
-  e.preventDefault(); // Evita que la pantalla haga scroll
+  e.preventDefault();
 
   const touch = e.touches[0];
   const rect = game.getBoundingClientRect();
@@ -159,7 +152,6 @@ game.addEventListener("touchmove", (e) => {
   const gameWidth = game.clientWidth;
   const playerWidth = player.offsetWidth;
 
-  // Centra el jugador donde está el dedo
   let newLeft = touch.clientX - rect.left - playerWidth / 2;
 
   newLeft = Math.max(0, Math.min(gameWidth - playerWidth, newLeft));
@@ -181,7 +173,6 @@ function createObstacle() {
   const gameWidth = game.clientWidth;
   const obstacleWidth = gameWidth * 0.08;
 
-  // Posición aleatoria horizontal
   let obstacleX = Math.random() * (gameWidth - obstacleWidth);
   obstacle.style.left = obstacleX + "px";
   obstacle.style.top = "0px";
@@ -198,11 +189,9 @@ function createObstacle() {
       return;
     }
 
-    // Movimiento hacia abajo
-    obstacleY += speed;
+    obstacleY += speed; // 🔥 Mucho más rápido
     obstacle.style.top = obstacleY + "px";
 
-    /* 🎯 DETECCIÓN DE COLISIÓN */
     const playerRect = player.getBoundingClientRect();
     const obstacleRect = obstacle.getBoundingClientRect();
 
@@ -214,13 +203,12 @@ function createObstacle() {
       endGame();
     }
 
-    // Si sale de pantalla
     if (obstacleY > game.clientHeight) {
       clearInterval(fall);
       obstacle.remove();
     }
 
-  }, 20);
+  }, 15); // 🔥 Antes 20 → ahora más fluido y rápido
 }
 
 /* ============================= */
@@ -246,9 +234,9 @@ function resetGame() {
   document.querySelectorAll(".obstacle").forEach(o => o.remove());
 
   score = 0;
-  speed = 3;
+  speed = 5;
   level = 1;
-  obstacleSpawnRate = 1000;
+  obstacleSpawnRate = 700;
 
   scoreDisplay.textContent = score;
   levelDisplay.textContent = level;
